@@ -23,21 +23,17 @@ import java.util.Optional;
 public class AnalisePropostaService {
 
     private static Logger logger = LoggerFactory.getLogger(AnalisePropostaService.class);
-    // +1
-    private AnalisePropostaResponse analisePropostaResponse;
 
-    private final ObjectMapper objectMapper;
     // +1
     private final AnalisePropostaConsumer analisePropostaConsumer;
 
-    public AnalisePropostaService(ObjectMapper objectMapper, AnalisePropostaConsumer analisePropostaConsumer) {
-        this.objectMapper = objectMapper;
+    public AnalisePropostaService(AnalisePropostaConsumer analisePropostaConsumer) {
         this.analisePropostaConsumer = analisePropostaConsumer;
     }
 
-    // +1
+    // +2
     public Optional<AnalisePropostaResponse> analisa(Proposta proposta) throws JsonProcessingException {
-
+        ObjectMapper objectMapper = new ObjectMapper();
         // +1
         try{
             AnalisePropostaResponse analisePropostaResponse = analisePropostaConsumer.avaliacaoFinanceira(proposta.toAnalisePropostaRequest());
@@ -50,7 +46,7 @@ public class AnalisePropostaService {
             //+1
             if (exception.status() == HttpStatus.UNPROCESSABLE_ENTITY.value()){
                 logger.info("Proposta com restrição. idProposta: {}", proposta.getId());
-                return Optional.of(analisePropostaResponse = objectMapper.readValue(exception.contentUTF8(), AnalisePropostaResponse.class));
+                return Optional.of(objectMapper.readValue(exception.contentUTF8(), AnalisePropostaResponse.class));
             }
             logger.error("Erro ao solicitar analise de proposta. idProposta: {}", proposta.getId());
 

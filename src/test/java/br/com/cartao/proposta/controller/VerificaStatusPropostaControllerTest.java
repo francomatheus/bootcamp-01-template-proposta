@@ -37,7 +37,7 @@ class VerificaStatusPropostaControllerTest {
 
         VerificaStatusPropostaController verificaStatusPropostaController = new VerificaStatusPropostaController( propostaRepository);
 
-        when(verificaStatusPropostaController.getEmailUsuarioSolicitante()).thenReturn("jose@exemplo.com");
+//        when(verificaStatusPropostaController.getEmailUsuarioSolicitante()).thenReturn("jose@exemplo.com");
         when(propostaRepository.findById(id)).thenReturn(Optional.of(proposta));
 
         ResponseEntity<?> responseEntity = verificaStatusPropostaController.verificaStatusProposta(id);

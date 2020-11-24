@@ -35,8 +35,8 @@ public class VerificaStatusPropostaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> verificaStatusProposta(@PathVariable String id){
-        String emailUsuarioSolicitante = getEmailUsuarioSolicitante();
-        logger.info("Usuario solicitante: {}", emailUsuarioSolicitante);
+//        String emailUsuarioSolicitante = getEmailUsuarioSolicitante();
+//        logger.info("Usuario solicitante: {}", emailUsuarioSolicitante);
 
         logger.info("Requisição recebida para verificar o status da proposta. idProposta: {}", id);
         // +1
@@ -47,20 +47,20 @@ public class VerificaStatusPropostaController {
             return ResponseEntity.notFound().build();
         }
         // +1
-        if (!emailUsuarioSolicitante.equals(propostaBuscada.get().getEmail())){
-            //Assert.isTrue(emailUsuarioSolicitante.equals(propostaBuscada.get().getEmail()), "Usuario não pode verificar proposta que não é dele. ");
-            return ResponseEntity.badRequest().body("Usuario não pode verificar proposta que não é dele!");
-        }
+//        if (!emailUsuarioSolicitante.equals(propostaBuscada.get().getEmail())){
+//            //Assert.isTrue(emailUsuarioSolicitante.equals(propostaBuscada.get().getEmail()), "Usuario não pode verificar proposta que não é dele. ");
+//            return ResponseEntity.badRequest().body("Usuario não pode verificar proposta que não é dele!");
+//        }
 
         NovaPropostaResponseDto novaPropostaResponseDto = new NovaPropostaResponseDto(propostaBuscada.get());
 
         return ResponseEntity.ok(novaPropostaResponseDto);
     }
 
-    protected String getEmailUsuarioSolicitante() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt principal = (Jwt) authentication.getPrincipal();
-        String emailUsuario = (String) principal.getClaims().get("email");
-        return emailUsuario;
-    }
+//    protected String getEmailUsuarioSolicitante() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Jwt principal = (Jwt) authentication.getPrincipal();
+//        String emailUsuario = (String) principal.getClaims().get("email");
+//        return emailUsuario;
+//    }
 }

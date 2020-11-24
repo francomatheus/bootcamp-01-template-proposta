@@ -8,6 +8,7 @@ import br.com.cartao.proposta.domain.response.AnalisePropostaResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import feign.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,13 +16,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class AnalisePropostaServiceTest {
 
     private ObjectMapper objectMapper;
@@ -44,14 +49,16 @@ public class AnalisePropostaServiceTest {
     @Test
     @DisplayName("Deve retornar objeto AnalisePropostaResponse com o Status da Analise sem restricao")
     void deveRetornarStatusDaAnaliseFinanceiraSemRestricao() throws JsonProcessingException {
-
-        propostaElegivel.setId("asdasdasd");
-        AnalisePropostaRequest analisePropostaRequest = propostaElegivel.toAnalisePropostaRequest();
+        // cenario
         AnalisePropostaResponse analisePropostaResponse = new AnalisePropostaResponse(propostaElegivel.getDocumento(), propostaElegivel.getNome(), propostaElegivel.getId(), EstadoAnaliseProposta.SEM_RESTRICAO);
 
-        AnalisePropostaService analisePropostaService = new AnalisePropostaService(objectMapper,analisePropostaConsumer);
+        AnalisePropostaService analisePropostaService = new AnalisePropostaService(analisePropostaConsumer);
+
+        // acao
 
         Optional<AnalisePropostaResponse> analisa = analisePropostaService.analisa(propostaElegivel);
+
+        // verificação
 
         Assertions.assertEquals(EstadoAnaliseProposta.SEM_RESTRICAO,analisa.get().getResultadoSolicitacao());
     }
@@ -62,11 +69,10 @@ public class AnalisePropostaServiceTest {
 
         AnalisePropostaRequest analisePropostaRequest = propostaNaoElegivel.toAnalisePropostaRequest();
         AnalisePropostaResponse analisePropostaResponse = new AnalisePropostaResponse(propostaNaoElegivel.getDocumento(), propostaNaoElegivel.getNome(), propostaNaoElegivel.getId(), EstadoAnaliseProposta.COM_RESTRICAO);
-        AnalisePropostaService analisePropostaService = new AnalisePropostaService(objectMapper,analisePropostaConsumer);
 
+        AnalisePropostaService analisePropostaService = new AnalisePropostaService(analisePropostaConsumer);
         Optional<AnalisePropostaResponse> analisa = analisePropostaService.analisa(propostaNaoElegivel);
 
-        //verify(analisePropostaConsumer, times(1)).avaliacaoFinanceira(analisePropostaRequest);
         FeignException feignException = Assertions.assertThrows(FeignException.class, () -> analisePropostaConsumer.avaliacaoFinanceira(analisePropostaRequest));
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), feignException.status());
         Assertions.assertEquals(EstadoAnaliseProposta.COM_RESTRICAO,analisa.get().getResultadoSolicitacao());
@@ -78,14 +84,13 @@ public class AnalisePropostaServiceTest {
 
         Proposta propostaErrada = new Proposta("", "teste@exemplo.com","Endereco","José Maria", BigDecimal.valueOf(1000));
         AnalisePropostaRequest analisePropostaRequest = propostaErrada.toAnalisePropostaRequest();
-        AnalisePropostaService analisePropostaService = new AnalisePropostaService(objectMapper,analisePropostaConsumer);
-        try{
-            Optional<AnalisePropostaResponse> analisa = analisePropostaService.analisa(propostaErrada);
-            fail();
-        }catch (Exception exception){
-            FeignException feignException = Assertions.assertThrows(FeignException.class, () -> analisePropostaConsumer.avaliacaoFinanceira(analisePropostaRequest));
-            Assertions.assertTrue(feignException.status() != HttpStatus.UNPROCESSABLE_ENTITY.value());
-        }
+        AnalisePropostaConsumer analisePropostaConsumer = mock(AnalisePropostaConsumer.class);
+        AnalisePropostaService analisePropostaService = new AnalisePropostaService(analisePropostaConsumer);
+
+        Optional<AnalisePropostaResponse> analisa = analisePropostaService.analisa(propostaErrada);
+
+        FeignException feignException = Assertions.assertThrows(FeignException.class, () -> analisePropostaConsumer.avaliacaoFinanceira(analisePropostaRequest));
+        Assertions.assertTrue(feignException.status() != HttpStatus.UNPROCESSABLE_ENTITY.value());
 
     }
 

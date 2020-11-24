@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface AnalisePropostaConsumer {
 
     @RequestMapping(method = RequestMethod.POST, path = "/api/solicitacao" )
-    public AnalisePropostaResponse avaliacaoFinanceira(AnalisePropostaRequest analisePropostaRequest);
+    AnalisePropostaResponse avaliacaoFinanceira(AnalisePropostaRequest analisePropostaRequest);
 }

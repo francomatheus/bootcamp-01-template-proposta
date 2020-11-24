@@ -41,7 +41,7 @@ class NovaPropostaServiceTest {
     void deveCriarNovaProposta() throws JsonProcessingException {
         PropostaRepository propostaRepository = mock(PropostaRepository.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        AnalisePropostaService analisePropostaService = new AnalisePropostaService(objectMapper,analisePropostaConsumer);
+        AnalisePropostaService analisePropostaService = new AnalisePropostaService(analisePropostaConsumer);
         NovaPropostaService novaPropostaService = new NovaPropostaService(propostaRepository,analisePropostaService);
         Proposta proposta = novaPropostaRequest.toModel();
         proposta.setId("1");

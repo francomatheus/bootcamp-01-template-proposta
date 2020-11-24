@@ -17,8 +17,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/actuator/prometheus/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/actuator/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/actuator/prometheus/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/actuator/**").permitAll()
+                        .antMatchers(HttpMethod.GET,  "/v3/api-docs/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/swagger-ui/**", "/swagger-ui/index.html").permitAll()
                         .anyRequest().authenticated()
                 .and()
                         .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
